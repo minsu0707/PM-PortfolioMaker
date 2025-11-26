@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ArrowRight, Zap, Shield, Rocket } from "lucide-react"
-import { useLanguageContext } from "@/contexts/language-context"
-import { useTheme } from "@/hooks/use-theme"
-import { getTranslation } from "@/lib/i18n"
+import Link from "next/link";
+import { ArrowRight, Zap, Shield, Rocket } from "lucide-react";
+import { useLanguageContext } from "@/contexts/language-context";
+import { useTheme } from "@/hooks/use-theme";
+import { getTranslation } from "@/lib/i18n";
 
 export default function Home() {
-  const { language } = useLanguageContext()
-  const { theme } = useTheme()
+  const { language } = useLanguageContext();
+  const { theme } = useTheme();
 
-  const t = (key: string) => getTranslation(language, key)
+  const t = (key: string) => getTranslation(language, key);
 
   const features = [
     {
@@ -28,14 +28,14 @@ export default function Home() {
       title: t("features.email.title"),
       description: t("features.email.desc"),
     },
-  ]
+  ];
 
   const stats = [
     { number: "10K+", label: t("stats.portfolios") },
     { number: "98%", label: t("stats.satisfaction") },
     { number: "2min", label: t("stats.time") },
     { number: "100%", label: t("stats.free") },
-  ]
+  ];
 
   return (
     <div
@@ -102,7 +102,9 @@ export default function Home() {
       {/* Features Section */}
       <section
         className={`py-20 px-4 sm:px-6 lg:px-8 ${
-          theme === "dark" ? "border-t border-slate-800" : "border-t border-blue-100/50"
+          theme === "dark"
+            ? "border-t border-slate-800"
+            : "border-t border-blue-100/50"
         }`}
       >
         <div className="max-w-6xl mx-auto">
@@ -116,7 +118,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, idx) => {
-              const Icon = feature.icon
+              const Icon = feature.icon;
               return (
                 <div
                   key={idx}
@@ -128,17 +130,29 @@ export default function Home() {
                 >
                   <div
                     className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${
-                      theme === "dark" ? "bg-cyan-500/20 text-cyan-400" : "bg-blue-100 text-blue-600"
+                      theme === "dark"
+                        ? "bg-cyan-500/20 text-cyan-400"
+                        : "bg-blue-100 text-blue-600"
                     }`}
                   >
                     <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className={`text-xl font-bold mb-2 ${theme === "dark" ? "text-white" : "text-slate-900"}`}>
+                  <h3
+                    className={`text-xl font-bold mb-2 ${
+                      theme === "dark" ? "text-white" : "text-slate-900"
+                    }`}
+                  >
                     {feature.title}
                   </h3>
-                  <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>{feature.description}</p>
+                  <p
+                    className={
+                      theme === "dark" ? "text-slate-400" : "text-slate-600"
+                    }
+                  >
+                    {feature.description}
+                  </p>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
@@ -157,11 +171,19 @@ export default function Home() {
             {stats.map((stat, idx) => (
               <div key={idx} className="space-y-2">
                 <div
-                  className={`text-4xl md:text-5xl font-black ${theme === "dark" ? "text-cyan-400" : "text-blue-600"}`}
+                  className={`text-4xl md:text-5xl font-black ${
+                    theme === "dark" ? "text-cyan-400" : "text-blue-600"
+                  }`}
                 >
                   {stat.number}
                 </div>
-                <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>{stat.label}</p>
+                <p
+                  className={
+                    theme === "dark" ? "text-slate-400" : "text-slate-600"
+                  }
+                >
+                  {stat.label}
+                </p>
               </div>
             ))}
           </div>
@@ -177,10 +199,20 @@ export default function Home() {
               : "bg-gradient-to-r from-blue-50 to-blue-100/50 border-blue-200"
           }`}
         >
-          <h2 className={`text-3xl font-bold mb-4 ${theme === "dark" ? "text-white" : "text-slate-900"}`}>
+          <h2
+            className={`text-3xl font-bold mb-4 ${
+              theme === "dark" ? "text-white" : "text-slate-900"
+            }`}
+          >
             {t("cta.title")}
           </h2>
-          <p className={`mb-8 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>{t("cta.description")}</p>
+          <p
+            className={`mb-8 ${
+              theme === "dark" ? "text-slate-400" : "text-slate-600"
+            }`}
+          >
+            {t("cta.description")}
+          </p>
           <Link
             href="/builder"
             className={`inline-block px-8 py-3 rounded-full font-semibold transition-all ${
@@ -194,5 +226,5 @@ export default function Home() {
         </div>
       </section>
     </div>
-  )
+  );
 }

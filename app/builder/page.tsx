@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { ChevronLeft, ChevronRight, Download, Printer } from "lucide-react"
-import { useLanguageContext } from "@/contexts/language-context"
-import { getTranslation } from "@/lib/i18n"
-import BasicInfoStep from "@/components/builder/steps/basic-info-step"
-import ProjectsStep from "@/components/builder/steps/projects-step"
-import SkillsStep from "@/components/builder/steps/skills-step"
-import CertificationsStep from "@/components/builder/steps/certifications-step"
-import PortfolioPreview from "@/components/portfolio-preview"
-import ExportModal from "@/components/export-modal"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight, Download, Printer } from "lucide-react";
+import { useLanguageContext } from "@/contexts/language-context";
+import { getTranslation } from "@/lib/i18n";
+import BasicInfoStep from "@/components/builder/steps/basic-info-step";
+import ProjectsStep from "@/components/builder/steps/projects-step";
+import SkillsStep from "@/components/builder/steps/skills-step";
+import CertificationsStep from "@/components/builder/steps/certifications-step";
+import PortfolioPreview from "@/components/portfolio-preview";
+import ExportModal from "@/components/export-modal";
 
 const INITIAL_FORM_DATA = {
   name: "",
@@ -24,41 +24,48 @@ const INITIAL_FORM_DATA = {
   skills: [],
   certifications: [],
   awards: [],
-}
+};
 
 export default function BuilderPage() {
-  const { language } = useLanguageContext()
-  const [currentStep, setCurrentStep] = useState(1)
-  const [formData, setFormData] = useState(INITIAL_FORM_DATA)
-  const [isMounted, setIsMounted] = useState(false)
-  const [exportModal, setExportModal] = useState<{ isOpen: boolean; type: "pdf" | "print" }>({
+  const { language } = useLanguageContext();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  const [isMounted, setIsMounted] = useState(false);
+  const [exportModal, setExportModal] = useState<{
+    isOpen: boolean;
+    type: "pdf" | "print";
+  }>({
     isOpen: false,
     type: "pdf",
-  })
+  });
 
-  const t = (key: string) => getTranslation(language || "en", key)
+  const t = (key: string) => getTranslation(language || "en", key);
 
   useEffect(() => {
-    const savedData = localStorage.getItem("portfolioFormData")
+    const savedData = localStorage.getItem("portfolioFormData");
     if (savedData) {
       try {
-        setFormData(JSON.parse(savedData))
+        setFormData(JSON.parse(savedData));
       } catch (e) {
-        console.error("Error loading saved data:", e)
+        console.error("Error loading saved data:", e);
       }
     }
-    setIsMounted(true)
-  }, [])
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
-    if (!isMounted) return
+    if (!isMounted) return;
 
     const autoSaveInterval = setInterval(() => {
-      localStorage.setItem("portfolioFormData", JSON.stringify(formData))
+      localStorage.setItem("portfolioFormData", JSON.stringify(formData));
 
       // Save to drafts list for gallery
-      const drafts = JSON.parse(localStorage.getItem("portfolioDrafts") || "[]")
-      const existingDraftIndex = drafts.findIndex((d: any) => d.id === "current-draft")
+      const drafts = JSON.parse(
+        localStorage.getItem("portfolioDrafts") || "[]"
+      );
+      const existingDraftIndex = drafts.findIndex(
+        (d: any) => d.id === "current-draft"
+      );
 
       const draftEntry = {
         id: "current-draft",
@@ -66,82 +73,98 @@ export default function BuilderPage() {
         email: formData.email,
         lastSaved: new Date().toISOString(),
         data: formData,
-      }
+      };
 
       if (existingDraftIndex >= 0) {
-        drafts[existingDraftIndex] = draftEntry
+        drafts[existingDraftIndex] = draftEntry;
       } else {
-        drafts.push(draftEntry)
+        drafts.push(draftEntry);
       }
 
-      localStorage.setItem("portfolioDrafts", JSON.stringify(drafts))
-    }, 2000)
+      localStorage.setItem("portfolioDrafts", JSON.stringify(drafts));
+    }, 2000);
 
-    return () => clearInterval(autoSaveInterval)
-  }, [formData, isMounted])
+    return () => clearInterval(autoSaveInterval);
+  }, [formData, isMounted]);
 
   const translatedSteps = [
     {
       id: 1,
       title: t("builder.basicInfo") || "Basic Info",
-      description: t("builder.basicInfoDesc") || "Your profile and contact info",
+      description:
+        t("builder.basicInfoDesc") || "Your profile and contact info",
     },
     {
       id: 2,
       title: t("builder.projects") || "Projects",
       description: t("builder.projectsDesc") || "Showcase your work",
     },
-    { id: 3, title: t("builder.skills") || "Skills", description: t("builder.skillsDesc") || "Technical skills" },
+    {
+      id: 3,
+      title: t("builder.skills") || "Skills",
+      description: t("builder.skillsDesc") || "Technical skills",
+    },
     {
       id: 4,
       title: t("builder.certs") || "Certifications",
       description: t("builder.certsDesc") || "Certificates & Awards",
     },
-  ]
+  ];
 
   const handleNext = () => {
     if (currentStep < translatedSteps.length) {
-      setCurrentStep(currentStep + 1)
+      setCurrentStep(currentStep + 1);
     }
-  }
+  };
 
   const handlePrev = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
+      setCurrentStep(currentStep - 1);
     }
-  }
+  };
 
   const updateFormData = (key: string, value: any) => {
     setFormData((prev) => ({
       ...prev,
       [key]: value,
-    }))
-  }
+    }));
+  };
 
   const handleDownloadPDF = () => {
-    setExportModal({ isOpen: true, type: "pdf" })
-  }
+    setExportModal({ isOpen: true, type: "pdf" });
+  };
 
   const handlePrint = () => {
-    setExportModal({ isOpen: true, type: "print" })
-  }
+    setExportModal({ isOpen: true, type: "print" });
+  };
 
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <BasicInfoStep formData={formData} updateFormData={updateFormData} />
+        return (
+          <BasicInfoStep formData={formData} updateFormData={updateFormData} />
+        );
       case 2:
-        return <ProjectsStep formData={formData} updateFormData={updateFormData} />
+        return (
+          <ProjectsStep formData={formData} updateFormData={updateFormData} />
+        );
       case 3:
-        return <SkillsStep formData={formData} updateFormData={updateFormData} />
+        return (
+          <SkillsStep formData={formData} updateFormData={updateFormData} />
+        );
       case 4:
-        return <CertificationsStep formData={formData} updateFormData={updateFormData} />
+        return (
+          <CertificationsStep
+            formData={formData}
+            updateFormData={updateFormData}
+          />
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
-  if (!isMounted) return null
+  if (!isMounted) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-background/95">
@@ -153,7 +176,8 @@ export default function BuilderPage() {
               {t("form.buildYourPortfolio") || "Build Your Portfolio"}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {t("form.stepOf") || "Step"} {currentStep} {t("form.of") || "of"} 4
+              {t("form.stepOf") || "Step"} {currentStep} {t("form.of") || "of"}{" "}
+              4
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -173,7 +197,10 @@ export default function BuilderPage() {
               <Printer className="w-4 h-4" />
               {t("builder.print") || "Print"}
             </button>
-            <Link href="/" className="text-primary hover:text-primary/80 transition-colors font-semibold text-sm">
+            <Link
+              href="/"
+              className="text-primary hover:text-primary/80 transition-colors font-semibold text-sm"
+            >
               ← {t("nav.home") || "Home"}
             </Link>
           </div>
@@ -198,18 +225,24 @@ export default function BuilderPage() {
                           step.id <= currentStep
                             ? "bg-primary text-primary-foreground"
                             : "bg-muted text-muted-foreground"
-                        } ${step.id === currentStep ? "ring-2 ring-accent" : ""}`}
+                        } ${
+                          step.id === currentStep ? "ring-2 ring-accent" : ""
+                        }`}
                       >
-                        <div className="font-semibold text-xs">{step.title}</div>
+                        <div className="font-semibold text-xs">
+                          {step.title}
+                        </div>
                       </button>
-                    )
+                    );
                   }
                 })}
               </div>
             </div>
 
             {/* Step Content */}
-            <div className="bg-card rounded-xl border border-border p-6 mb-8">{renderStep()}</div>
+            <div className="bg-card rounded-xl border border-border p-6 mb-8">
+              {renderStep()}
+            </div>
 
             {/* Navigation Buttons */}
             <div className="flex justify-between gap-4">
@@ -245,10 +278,15 @@ export default function BuilderPage() {
         {/* Right: Real-time Preview */}
         <div className="w-1/2 overflow-y-auto bg-muted/30">
           <div className="sticky top-0 bg-card/80 backdrop-blur border-b border-border px-6 py-3">
-            <h3 className="font-semibold text-foreground text-sm">{t("form.livePreview") || "Live Preview"}</h3>
+            <h3 className="font-semibold text-foreground text-sm">
+              {t("form.livePreview") || "Live Preview"}
+            </h3>
           </div>
           <div className="p-6">
-            <div id="portfolio-preview-content" className="bg-white text-black rounded-lg shadow-lg overflow-hidden">
+            <div
+              id="portfolio-preview-content"
+              className="bg-white text-black rounded-lg shadow-lg overflow-hidden"
+            >
               <PortfolioPreview formData={formData} />
             </div>
           </div>
@@ -257,11 +295,13 @@ export default function BuilderPage() {
 
       <ExportModal
         isOpen={exportModal.isOpen}
-        onClose={() => setExportModal({ isOpen: false, type: exportModal.type })}
+        onClose={() =>
+          setExportModal({ isOpen: false, type: exportModal.type })
+        }
         title={exportModal.type === "pdf" ? "Download PDF" : "Print Portfolio"}
         formData={formData}
         type={exportModal.type}
       />
     </div>
-  )
+  );
 }

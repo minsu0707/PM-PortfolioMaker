@@ -1,5 +1,5 @@
-export const languages = ["ko", "en", "ja", "zh"] as const
-export type Language = (typeof languages)[number]
+export const languages = ["ko", "en", "ja", "zh"] as const;
+export type Language = (typeof languages)[number];
 
 export const translations: Record<Language, Record<string, string>> = {
   ko: {
@@ -132,9 +132,11 @@ export const translations: Record<Language, Record<string, string>> = {
     // Features
     "features.title": "Everything You Need",
     "features.pdf.title": "PDF Download",
-    "features.pdf.desc": "Export your portfolio as a professional PDF with perfect formatting",
+    "features.pdf.desc":
+      "Export your portfolio as a professional PDF with perfect formatting",
     "features.print.title": "Print Ready",
-    "features.print.desc": "Print directly to create physical copies of your portfolio",
+    "features.print.desc":
+      "Print directly to create physical copies of your portfolio",
     "features.email.title": "Email Sharing",
     "features.email.desc": "Send your portfolio directly to your email address",
 
@@ -238,7 +240,8 @@ export const translations: Record<Language, Record<string, string>> = {
     // Features
     "features.title": "必要なすべての機能",
     "features.pdf.title": "PDFダウンロード",
-    "features.pdf.desc": "ポートフォリオをプロフェッショナルなPDF形式でエクスポート",
+    "features.pdf.desc":
+      "ポートフォリオをプロフェッショナルなPDF形式でエクスポート",
     "features.print.title": "印刷対応",
     "features.print.desc": "直接印刷してポートフォリオの物理的なコピーを作成",
     "features.email.title": "メール共有",
@@ -252,7 +255,8 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // CTA
     "cta.title": "準備はできていますか？",
-    "cta.description": "今日、数千人がプロフェッショナルなポートフォリオを作成しています",
+    "cta.description":
+      "今日、数千人がプロフェッショナルなポートフォリオを作成しています",
     "cta.button": "ポートフォリオを作成",
 
     // Builder
@@ -315,7 +319,8 @@ export const translations: Record<Language, Record<string, string>> = {
     // Gallery
     "gallery.drafts": "ドラフト",
     "gallery.draftsSaved": "自動保存されたポートフォリオドラフト",
-    "gallery.noDrafts": "保存されたドラフトはまだありません。ポートフォリオの作成を開始してください!",
+    "gallery.noDrafts":
+      "保存されたドラフトはまだありません。ポートフォリオの作成を開始してください!",
     "gallery.lastSaved": "最後に保存：",
     "gallery.continueDraft": "編集を続ける",
     "gallery.untitled": "タイトルなし",
@@ -426,8 +431,8 @@ export const translations: Record<Language, Record<string, string>> = {
     "gallery.continueDraft": "继续编辑",
     "gallery.untitled": "无标题",
   },
-}
+};
 
 export function getTranslation(language: Language, key: string): string {
-  return translations[language]?.[key] || key
+  return translations[language]?.[key] || key;
 }
