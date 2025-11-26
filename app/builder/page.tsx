@@ -10,6 +10,7 @@ import ProjectsStep from "@/components/builder/steps/projects-step"
 import SkillsStep from "@/components/builder/steps/skills-step"
 import CertificationsStep from "@/components/builder/steps/certifications-step"
 import PortfolioPreview from "@/components/portfolio-preview"
+import ExportModal from "@/components/export-modal"
 
 const INITIAL_FORM_DATA = {
   name: "",
@@ -30,6 +31,10 @@ export default function BuilderPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState(INITIAL_FORM_DATA)
   const [isMounted, setIsMounted] = useState(false)
+  const [exportModal, setExportModal] = useState<{ isOpen: boolean; type: "pdf" | "print" }>({
+    isOpen: false,
+    type: "pdf",
+  })
 
   const t = (key: string) => getTranslation(language || "en", key)
 
@@ -113,35 +118,12 @@ export default function BuilderPage() {
     }))
   }
 
-  const handleDownloadPDF = async () => {
-    const element = document.getElementById("portfolio-preview-content")
-    if (!element) return
-
-    try {
-      const html2pdf = (await import("html2pdf.js")).default
-      const options = {
-        margin: 10,
-        filename: `${formData.name || "portfolio"}.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { orientation: "portrait", unit: "mm", format: "a4" },
-      }
-      html2pdf().set(options).from(element).save()
-    } catch (error) {
-      console.error("Error generating PDF:", error)
-    }
+  const handleDownloadPDF = () => {
+    setExportModal({ isOpen: true, type: "pdf" })
   }
 
   const handlePrint = () => {
-    const element = document.getElementById("portfolio-preview-content")
-    if (!element) return
-
-    const printWindow = window.open("", "", "height=600,width=800")
-    if (printWindow) {
-      printWindow.document.write(element.innerHTML)
-      printWindow.document.close()
-      printWindow.print()
-    }
+    setExportModal({ isOpen: true, type: "print" })
   }
 
   const renderStep = () => {
@@ -272,6 +254,14 @@ export default function BuilderPage() {
           </div>
         </div>
       </div>
+
+      <ExportModal
+        isOpen={exportModal.isOpen}
+        onClose={() => setExportModal({ isOpen: false, type: exportModal.type })}
+        title={exportModal.type === "pdf" ? "Download PDF" : "Print Portfolio"}
+        formData={formData}
+        type={exportModal.type}
+      />
     </div>
   )
 }
