@@ -1,35 +1,41 @@
-"use client"
+"use client";
 
-import { X, Download } from "lucide-react"
-import { useEffect, useRef } from "react"
-import { Mail, Github, Linkedin, ExternalLink } from "lucide-react"
-import html2canvas from "html2canvas"
-import jsPDF from "jspdf"
+import { X, Download } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Mail, Github, Linkedin, ExternalLink } from "lucide-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface ExportModalProps {
-  isOpen: boolean
-  onClose: () => void
-  title: string
-  formData: any
-  type: "pdf" | "print"
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  formData: any;
+  type: "pdf" | "print";
 }
 
-export default function ExportModal({ isOpen, onClose, title, formData, type }: ExportModalProps) {
-  const previewRef = useRef<HTMLDivElement>(null)
+export default function ExportModal({
+  isOpen,
+  onClose,
+  title,
+  formData,
+  type,
+}: ExportModalProps) {
+  const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-    }
+      if (e.key === "Escape") onClose();
+    };
 
-    window.addEventListener("keydown", handleEscape)
-    return () => window.removeEventListener("keydown", handleEscape)
-  }, [isOpen, onClose])
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onClose]);
 
   const handleDownloadPDF = async () => {
-    if (!previewRef.current) return
+    if (!previewRef.current) return;
 
     try {
       const canvas = await html2canvas(previewRef.current, {
@@ -39,44 +45,58 @@ export default function ExportModal({ isOpen, onClose, title, formData, type }: 
         logging: false,
         backgroundColor: "#ffffff",
         foreignObjectRendering: true,
-      })
+      });
 
-      const imgData = canvas.toDataURL("image/png")
-      const pdf = new jsPDF("p", "mm", "a4")
-      const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = pdf.internal.pageSize.getHeight()
-      const imgWidth = canvas.width
-      const imgHeight = canvas.height
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight)
-      const imgX = (pdfWidth - imgWidth * ratio) / 2
-      const imgY = 0
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 0;
 
-      let heightLeft = imgHeight * ratio
-      let position = 0
+      let heightLeft = imgHeight * ratio;
+      let position = 0;
 
-      pdf.addImage(imgData, "PNG", imgX, imgY, imgWidth * ratio, imgHeight * ratio)
-      heightLeft -= pdfHeight
+      pdf.addImage(
+        imgData,
+        "PNG",
+        imgX,
+        imgY,
+        imgWidth * ratio,
+        imgHeight * ratio
+      );
+      heightLeft -= pdfHeight;
 
       while (heightLeft >= 0) {
-        position = heightLeft - imgHeight * ratio
-        pdf.addPage()
-        pdf.addImage(imgData, "PNG", imgX, position, imgWidth * ratio, imgHeight * ratio)
-        heightLeft -= pdfHeight
+        position = heightLeft - imgHeight * ratio;
+        pdf.addPage();
+        pdf.addImage(
+          imgData,
+          "PNG",
+          imgX,
+          position,
+          imgWidth * ratio,
+          imgHeight * ratio
+        );
+        heightLeft -= pdfHeight;
       }
 
-      pdf.save(`${formData.name || "portfolio"}.pdf`)
+      pdf.save(`${formData.name || "portfolio"}.pdf`);
     } catch (error) {
-      console.error("Error generating PDF:", error)
-      alert("PDF 생성에 실패했습니다. 다시 시도해주세요.")
+      console.error("Error generating PDF:", error);
+      alert("PDF 생성에 실패했습니다. 다시 시도해주세요.");
     }
-  }
+  };
 
   const handlePrint = () => {
     if (previewRef.current) {
-      const printWindow = window.open("", "", "width=1000,height=800")
-      if (!printWindow) return
+      const printWindow = window.open("", "", "width=1000,height=800");
+      if (!printWindow) return;
 
-      const htmlContent = previewRef.current.innerHTML
+      const htmlContent = previewRef.current.innerHTML;
       printWindow.document.write(`
         <!DOCTYPE html>
         <html>
@@ -95,17 +115,17 @@ export default function ExportModal({ isOpen, onClose, title, formData, type }: 
           ${htmlContent}
         </body>
         </html>
-      `)
-      printWindow.document.close()
-      printWindow.focus()
+      `);
+      printWindow.document.close();
+      printWindow.focus();
 
       setTimeout(() => {
-        printWindow.print()
-      }, 300)
+        printWindow.print();
+      }, 300);
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -113,14 +133,20 @@ export default function ExportModal({ isOpen, onClose, title, formData, type }: 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border p-6">
           <h2 className="text-2xl font-bold text-foreground">{title}</h2>
-          <button onClick={onClose} className="p-2 hover:bg-muted rounded-lg transition-colors">
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-muted rounded-lg transition-colors"
+          >
             <X className="w-6 h-6 text-foreground" />
           </button>
         </div>
 
         {/* Preview Content */}
         <div className="overflow-y-auto flex-1 p-6">
-          <div ref={previewRef} className="w-full bg-white text-black p-12 space-y-12 rounded-lg shadow-sm">
+          <div
+            ref={previewRef}
+            className="w-full bg-white text-black p-12 space-y-12 rounded-lg shadow-sm"
+          >
             {/* Header */}
             <div className="flex gap-8 pb-8 border-b-2 border-gray-200">
               {formData.profileImage && (
@@ -162,7 +188,9 @@ export default function ExportModal({ isOpen, onClose, title, formData, type }: 
             {/* Projects */}
             {formData.projects && formData.projects.length > 0 && (
               <div>
-                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">Projects</h2>
+                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">
+                  Projects
+                </h2>
                 <div className="space-y-6">
                   {formData.projects.map((project: any, idx: number) => (
                     <div key={idx} className="border-l-4 border-blue-500 pl-4">
@@ -170,10 +198,15 @@ export default function ExportModal({ isOpen, onClose, title, formData, type }: 
                       <p className="text-sm text-gray-600 mb-2">
                         {project.period} • {project.status}
                       </p>
-                      {project.description && <p className="text-gray-700 mb-2">{project.description}</p>}
+                      {project.description && (
+                        <p className="text-gray-700 mb-2">
+                          {project.description}
+                        </p>
+                      )}
                       {project.responsibilities && (
                         <p className="text-sm mb-2">
-                          <strong>Responsibilities:</strong> {project.responsibilities}
+                          <strong>Responsibilities:</strong>{" "}
+                          {project.responsibilities}
                         </p>
                       )}
                       {project.issues && (
@@ -203,10 +236,15 @@ export default function ExportModal({ isOpen, onClose, title, formData, type }: 
             {/* Skills */}
             {formData.skills && formData.skills.length > 0 && (
               <div>
-                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">Skills</h2>
+                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">
+                  Skills
+                </h2>
                 <div className="flex flex-wrap gap-2">
                   {formData.skills.map((skill: string, idx: number) => (
-                    <span key={idx} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                    >
                       {skill}
                     </span>
                   ))}
@@ -217,7 +255,9 @@ export default function ExportModal({ isOpen, onClose, title, formData, type }: 
             {/* Certifications */}
             {formData.certifications && formData.certifications.length > 0 && (
               <div>
-                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">Certifications</h2>
+                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">
+                  Certifications
+                </h2>
                 <div className="space-y-2">
                   {formData.certifications.map((cert: any, idx: number) => (
                     <div key={idx} className="text-gray-700">
@@ -232,12 +272,16 @@ export default function ExportModal({ isOpen, onClose, title, formData, type }: 
             {/* Awards */}
             {formData.awards && formData.awards.length > 0 && (
               <div>
-                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">Awards</h2>
+                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">
+                  Awards
+                </h2>
                 <div className="space-y-2">
                   {formData.awards.map((award: any, idx: number) => (
                     <div key={idx} className="text-gray-700">
                       <p className="font-semibold">{award.name}</p>
-                      <p className="text-sm text-gray-600">{award.description}</p>
+                      <p className="text-sm text-gray-600">
+                        {award.description}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -264,5 +308,5 @@ export default function ExportModal({ isOpen, onClose, title, formData, type }: 
         </div>
       </div>
     </div>
-  )
+  );
 }
