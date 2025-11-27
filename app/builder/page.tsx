@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Download, Printer } from "lucide-react";
 import { useLanguageContext } from "@/contexts/language-context";
+import { useTheme } from "@/hooks/use-theme";
 import { getTranslation } from "@/lib/i18n";
 import BasicInfoStep from "@/components/builder/steps/basic-info-step";
 import ProjectsStep from "@/components/builder/steps/projects-step";
@@ -28,6 +29,7 @@ const INITIAL_FORM_DATA = {
 
 export default function BuilderPage() {
   const { language } = useLanguageContext();
+  const { theme } = useTheme();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [isMounted, setIsMounted] = useState(false);
@@ -77,8 +79,6 @@ export default function BuilderPage() {
 
       if (existingDraftIndex >= 0) {
         drafts[existingDraftIndex] = draftEntry;
-      } else {
-        drafts.push(draftEntry);
       }
 
       localStorage.setItem("portfolioDrafts", JSON.stringify(drafts));
@@ -96,18 +96,18 @@ export default function BuilderPage() {
     },
     {
       id: 2,
-      title: t("builder.projects") || "Projects",
-      description: t("builder.projectsDesc") || "Showcase your work",
-    },
-    {
-      id: 3,
       title: t("builder.skills") || "Skills",
       description: t("builder.skillsDesc") || "Technical skills",
     },
     {
-      id: 4,
+      id: 3,
       title: t("builder.certs") || "Certifications",
       description: t("builder.certsDesc") || "Certificates & Awards",
+    },
+    {
+      id: 4,
+      title: t("builder.projects") || "Projects",
+      description: t("builder.projectsDesc") || "Showcase your work",
     },
   ];
 
@@ -146,18 +146,18 @@ export default function BuilderPage() {
         );
       case 2:
         return (
-          <ProjectsStep formData={formData} updateFormData={updateFormData} />
-        );
-      case 3:
-        return (
           <SkillsStep formData={formData} updateFormData={updateFormData} />
         );
-      case 4:
+      case 3:
         return (
           <CertificationsStep
             formData={formData}
             updateFormData={updateFormData}
           />
+        );
+      case 4:
+        return (
+          <ProjectsStep formData={formData} updateFormData={updateFormData} />
         );
       default:
         return null;
@@ -287,7 +287,7 @@ export default function BuilderPage() {
               id="portfolio-preview-content"
               className="bg-white text-black rounded-lg shadow-lg overflow-hidden"
             >
-              <PortfolioPreview formData={formData} />
+              <PortfolioPreview formData={formData} theme={theme} />
             </div>
           </div>
         </div>
@@ -301,6 +301,7 @@ export default function BuilderPage() {
         title={exportModal.type === "pdf" ? "Download PDF" : "Print Portfolio"}
         formData={formData}
         type={exportModal.type}
+        theme={theme}
       />
     </div>
   );

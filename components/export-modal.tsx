@@ -2,9 +2,14 @@
 
 import { X, Download } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { Mail, Github, Linkedin, ExternalLink } from "lucide-react";
+import { Mail, Github, Linkedin } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import MarkdownPreview from "@uiw/react-markdown-preview";
+import rehypeSanitize from "rehype-sanitize";
+import { Theme } from "@/hooks/use-theme";
+import { useLanguageContext } from "@/contexts/language-context";
+import { getTranslation } from "@/lib/i18n";
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -12,6 +17,7 @@ interface ExportModalProps {
   title: string;
   formData: any;
   type: "pdf" | "print";
+  theme?: Theme | null;
 }
 
 export default function ExportModal({
@@ -20,8 +26,11 @@ export default function ExportModal({
   title,
   formData,
   type,
+  theme,
 }: ExportModalProps) {
   const previewRef = useRef<HTMLDivElement>(null);
+  const { language } = useLanguageContext();
+  const t = (key: string) => getTranslation(language || "en", key);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -35,16 +44,17 @@ export default function ExportModal({
   }, [isOpen, onClose]);
 
   const handleDownloadPDF = async () => {
-    if (!previewRef.current) return;
+    const element = previewRef.current;
+    if (!element) return;
 
     try {
-      const canvas = await html2canvas(previewRef.current, {
+      const canvas = await html2canvas(element, {
         scale: 2,
-        useCORS: true,
-        allowTaint: true,
         logging: false,
         backgroundColor: "#ffffff",
         foreignObjectRendering: true,
+        width: element.scrollWidth,
+        height: element.scrollHeight,
       });
 
       const imgData = canvas.toDataURL("image/png");
@@ -146,6 +156,7 @@ export default function ExportModal({
           <div
             ref={previewRef}
             className="w-full bg-white text-black p-12 space-y-12 rounded-lg shadow-sm"
+            data-color-mode={theme || "light"}
           >
             {/* Header */}
             <div className="flex gap-8 pb-8 border-b-2 border-gray-200">
@@ -161,7 +172,6 @@ export default function ExportModal({
                 <p className="text-xl text-gray-600 mb-4">{formData.major}</p>
                 <p className="text-gray-700 mb-4">{formData.bio}</p>
 
-                {/* Contact Info */}
                 <div className="flex flex-wrap gap-4 text-sm">
                   {formData.email && (
                     <div className="flex items-center gap-2">
@@ -185,59 +195,11 @@ export default function ExportModal({
               </div>
             </div>
 
-            {/* Projects */}
-            {formData.projects && formData.projects.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">
-                  Projects
-                </h2>
-                <div className="space-y-6">
-                  {formData.projects.map((project: any, idx: number) => (
-                    <div key={idx} className="border-l-4 border-blue-500 pl-4">
-                      <h3 className="text-xl font-bold">{project.title}</h3>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {project.period} • {project.status}
-                      </p>
-                      {project.description && (
-                        <p className="text-gray-700 mb-2">
-                          {project.description}
-                        </p>
-                      )}
-                      {project.responsibilities && (
-                        <p className="text-sm mb-2">
-                          <strong>Responsibilities:</strong>{" "}
-                          {project.responsibilities}
-                        </p>
-                      )}
-                      {project.issues && (
-                        <p className="text-sm mb-2">
-                          <strong>Challenges:</strong> {project.issues}
-                        </p>
-                      )}
-                      {project.technologies && (
-                        <p className="text-sm mb-2">
-                          <strong>Technologies:</strong> {project.technologies}
-                        </p>
-                      )}
-                      {project.link && (
-                        <a
-                          href={project.link}
-                          className="text-blue-600 hover:underline text-sm flex items-center gap-1"
-                        >
-                          View Project <ExternalLink className="w-3 h-3" />
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Skills */}
             {formData.skills && formData.skills.length > 0 && (
               <div>
                 <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">
-                  Skills
+                  {t("builder.skills") || "Skills"}
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {formData.skills.map((skill: string, idx: number) => (
@@ -256,7 +218,7 @@ export default function ExportModal({
             {formData.certifications && formData.certifications.length > 0 && (
               <div>
                 <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">
-                  Certifications
+                  {t("builder.certs") || "Certifications"}
                 </h2>
                 <div className="space-y-2">
                   {formData.certifications.map((cert: any, idx: number) => (
@@ -273,7 +235,7 @@ export default function ExportModal({
             {formData.awards && formData.awards.length > 0 && (
               <div>
                 <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">
-                  Awards
+                  {t("form.awards") || "Awards"}
                 </h2>
                 <div className="space-y-2">
                   {formData.awards.map((award: any, idx: number) => (
@@ -282,6 +244,85 @@ export default function ExportModal({
                       <p className="text-sm text-gray-600">
                         {award.description}
                       </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Projects */}
+            {formData.projects && formData.projects.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-gray-200">
+                  {t("builder.projects") || "Projects"}
+                </h2>
+                <div className="space-y-8">
+                  {formData.projects.map((project: any, idx: number) => (
+                    <div key={idx} className="border-l-4 border-blue-500 pl-6">
+                      <div className="flex items-center gap-4 mb-2">
+                        {project.logo && (
+                          <img
+                            src={project.logo}
+                            alt={project.title}
+                            className="w-12 h-12 rounded-lg object-contain"
+                          />
+                        )}
+                        <div>
+                          <h3 className="text-2xl font-bold">
+                            {project.title}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {project.period} • {project.status}
+                          </p>
+                        </div>
+                      </div>
+
+                      {project.description && (
+                        <div className="prose prose-sm max-w-none text-gray-700 mb-3">
+                          <MarkdownPreview
+                            source={project.description}
+                            rehypePlugins={[[rehypeSanitize]]}
+                          />
+                        </div>
+                      )}
+                      {project.roles && (
+                        <div className="mb-3">
+                          <strong className="text-sm">{t("form.roles")}:</strong>
+                          <div className="prose prose-sm max-w-none text-gray-700">
+                            <MarkdownPreview
+                              source={project.roles}
+                              rehypePlugins={[[rehypeSanitize]]}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {project.issue && (
+                        <div className="mb-3">
+                          <strong className="text-sm">{t("form.issue")}:</strong>
+                          <div className="prose prose-sm max-w-none text-gray-700">
+                            <MarkdownPreview
+                              source={project.issue}
+                              rehypePlugins={[[rehypeSanitize]]}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {project.technologies && (
+                        <p className="text-sm mb-2">
+                          <strong>{t("form.technologiesUsed")}:</strong>{" "}
+                          {project.technologies}
+                        </p>
+                      )}
+                      {project.link && (
+                        <a
+                          href={project.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline text-sm"
+                        >
+                          {project.link}
+                        </a>
+                      )}
                     </div>
                   ))}
                 </div>
